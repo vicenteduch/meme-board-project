@@ -1,0 +1,14 @@
+# Node
+node_modules/
+.env
+dist/
+.vscode/
+.DS_Store
+
+# Logs
+*.log
+
+# Build
+client/dist/
+server/node_modules/
+client/node_modules/
