@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import TaskForm from '../components/TaskForm';
 import { useFetchTasks } from '../hooks/useFetchTasks';
 import { useAddMeme } from '../hooks/useAddMeme';
 
 export default function BoardPage() {
+  const { userId } = useParams();
+  console.log('userId:', userId); // te mostrará "user1" si accedes a /board/user1
   const { tasks, setTasks, loading, toggleTask } = useFetchTasks();
   const { addMeme } = useAddMeme();
   const [showForm, setShowForm] = useState(false);
