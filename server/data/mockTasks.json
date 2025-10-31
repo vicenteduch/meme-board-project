@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "title": "Hacer la cama",
+    "description": "Tender las sábanas y dejar la habitación ordenada.",
+    "assignedTo": "user1",
+    "effortPoints": 1,
+    "status": "pending",
+    "meme": null
+  },
+  {
+    "id": 2,
+    "title": "Limpiar el baño",
+    "description": "Fregar lavabo y suelo.",
+    "assignedTo": "user2",
+    "effortPoints": 3,
+    "status": "pending",
+    "meme": "/memes/clean-bathroom.jpg"
+  }
+]

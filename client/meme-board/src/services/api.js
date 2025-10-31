@@ -15,7 +15,7 @@ const api = axios.create({
  ⚙️ MODO MOCK (para desarrollo sin backend)
 ========================================================== */
 
-const USE_MOCK = true;
+const USE_MOCK = false; // cambiar a true para usar datos mock
 
 // Datos de ejemplo
 let mockTasks = [
