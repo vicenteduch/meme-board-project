@@ -1,12 +1,12 @@
 [
   {
     "id": 1,
-    "title": "Hacer la cama",
-    "description": "Tender las sábanas y dejar la habitación ordenada.",
+    "title": "Limpiar arenero",
+    "description": "Limpiar cacotas gatos.",
     "assignedTo": "user1",
     "effortPoints": 1,
     "status": "pending",
-    "meme": null
+    "meme": "https://www.pikpng.com/pngl/b/409-4094448_yes-this-is-dog-cute-golden-retriever-memes.png"
   },
   {
     "id": 2,
@@ -15,6 +15,15 @@
     "assignedTo": "user2",
     "effortPoints": 3,
     "status": "pending",
-    "meme": "/memes/clean-bathroom.jpg"
+    "meme": "https://pngimg.com/uploads/doge_meme/doge_meme_PNG16.png"
+  },
+  {
+    "id": 1761911607339,
+    "title": "Llevarle agua a la munga",
+    "description": "",
+    "assignedTo": "user1",
+    "effortPoints": 1,
+    "status": "pending",
+    "meme": null
   }
 ]
