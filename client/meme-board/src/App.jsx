@@ -3,18 +3,27 @@ import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import BoardPage from './pages/BoardPage';
+import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
 function App() {
   return (
     <Router>
       <Navbar />
-      <main className="p-4">
+      <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/board" element={<BoardPage />} />
-          <Route path="/board/:userId" element={<BoardPage />} />
+
+          {/* ✅ Protected route aquí */}
+          <Route
+            path="/board/:userId"
+            element={
+              <ProtectedRoute>
+                <BoardPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
     </Router>
