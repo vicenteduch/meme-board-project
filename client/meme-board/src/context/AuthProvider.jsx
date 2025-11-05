@@ -22,8 +22,9 @@ export const AuthProvider = ({ children }) => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+      setLoading(false);
     } else {
-      loadCurrentUser(); // 👈 ahora sí se puede usar sin warning
+      loadCurrentUser();
     }
   }, [loadCurrentUser]);
 

@@ -8,7 +8,7 @@ export default function BoardPage() {
   const { addMeme } = useAddMeme();
   const [showForm, setShowForm] = useState(false);
 
-  const currentUser = { id: 'user1', role: 'admin' }; // usuario mock
+  const currentUser = { id: 'user1', role: 'admin' }; // Simulated current user
 
   if (loading) return <p className="text-center mt-10">Loading tasks...</p>;
 
@@ -26,7 +26,7 @@ export default function BoardPage() {
 
   const handleTaskCreated = (newTask) => {
     setTasks((prev) => [...prev, newTask]);
-    setShowForm(false); // ✅ Cerrar formulario automáticamente
+    setShowForm(false);
   };
 
   return (
@@ -34,7 +34,6 @@ export default function BoardPage() {
       <div className="fixed inset-0 -z-10 bg-[url('https://wallpapers.com/images/high/cork-board-background-2000-x-1328-0z2f3nkzu8w4q19a.webp')] bg-cover bg-center bg-no-repeat pointer-events-none"></div>
 
       <div className="relative z-10">
-        {/* 🟡 Botón para mostrar/ocultar el formulario */}
         <div className="text-center mb-6">
           <button
             onClick={() => setShowForm((prev) => !prev)}
@@ -44,7 +43,6 @@ export default function BoardPage() {
           </button>
         </div>
 
-        {/* ✨ Formulario con animación */}
         {showForm && (
           <div
             className="max-w-md mx-auto mb-6 animate-fadeIn"
@@ -56,7 +54,6 @@ export default function BoardPage() {
           </div>
         )}
 
-        {/* Grid de tareas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
           {tasks.map((task) => (
             <div
