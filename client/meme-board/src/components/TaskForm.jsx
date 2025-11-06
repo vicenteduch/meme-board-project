@@ -18,6 +18,7 @@ export default function TaskForm({ onCreated, currentUserId = 'user1' }) {
       assignedTo: currentUserId,
       effortPoints: Number(effort) || 1,
       status: 'pending',
+      completed: false,
       meme: null,
     };
 
