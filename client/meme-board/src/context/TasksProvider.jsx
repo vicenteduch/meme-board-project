@@ -62,6 +62,15 @@ export const TasksProvider = ({ children }) => {
     }
   };
 
+  // dentro del TasksProvider
+  const updateTaskLocal = (id, newData) => {
+    setTasks((prev) => {
+      const updated = prev.map((t) => (t.id === id ? { ...t, ...newData } : t));
+      localStorage.setItem('tasks', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const updateTask = async (id, currentUser) => {
     try {
       await completeTask(id, currentUser);
@@ -98,6 +107,18 @@ export const TasksProvider = ({ children }) => {
     }
   };
 
+  const resetTasks = () => {
+    setTasks((prev) => {
+      const reset = prev.map((t) => ({
+        ...t,
+        status: 'pending',
+        meme: null,
+      }));
+      localStorage.setItem('tasks', JSON.stringify(reset));
+      return reset;
+    });
+  };
+
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
@@ -111,7 +132,9 @@ export const TasksProvider = ({ children }) => {
         loadTasks,
         addTask,
         updateTask,
+        updateTaskLocal,
         removeTask,
+        resetTasks,
       }}
     >
       {children}
