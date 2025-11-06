@@ -4,7 +4,7 @@ import App from './App.jsx';
 import './tailwind.css';
 import './index.css';
 import { AuthProvider } from './context/AuthProvider.jsx';
-import { TasksProvider } from './context/TaskProvider.jsx';
+import { TasksProvider } from './context/TasksProvider.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
