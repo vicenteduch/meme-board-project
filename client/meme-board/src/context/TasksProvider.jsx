@@ -67,7 +67,13 @@ export const TasksProvider = ({ children }) => {
       await completeTask(id, currentUser);
       setTasks((prev) => {
         const updated = prev.map((t) =>
-          t.id === id ? { ...t, status: t.status === 'pending' ? 'completed' : 'pending' } : t
+          t.id === id
+            ? {
+                ...t,
+                status: t.status === 'pending' ? 'completed' : 'pending',
+                completed: !t.completed, // 🔄 asegúrate de actualizar también esta
+              }
+            : t
         );
         localStorage.setItem('tasks', JSON.stringify(updated));
         return updated;
