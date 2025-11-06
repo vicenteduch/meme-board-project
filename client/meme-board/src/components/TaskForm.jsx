@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { createTask } from '../services/api';
 
 export default function TaskForm({ onCreated, currentUserId = 'user1' }) {
   const [title, setTitle] = useState('');
@@ -13,7 +12,7 @@ export default function TaskForm({ onCreated, currentUserId = 'user1' }) {
     setError(null);
     if (!title.trim()) return setError('El título es obligatorio');
 
-    const payload = {
+    const newTask = {
       title: title.trim(),
       description: description.trim(),
       assignedTo: currentUserId,
@@ -22,16 +21,16 @@ export default function TaskForm({ onCreated, currentUserId = 'user1' }) {
       meme: null,
     };
 
-    setLoading(true);
     try {
-      const res = await createTask(payload);
-      const created = res && res.data ? res.data : res;
-      if (onCreated) onCreated(created);
+      setLoading(true);
+      if (onCreated) {
+        await onCreated(newTask); // ✅ delega al contexto
+      }
       setTitle('');
       setDescription('');
       setEffort(1);
     } catch (err) {
-      console.error('Error al crear tarea:', err);
+      console.error('❌ Error al crear tarea:', err);
       setError('No se pudo crear la tarea');
     } finally {
       setLoading(false);

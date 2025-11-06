@@ -1,31 +1,27 @@
 import { useState } from 'react';
 import TaskForm from '../components/TaskForm';
-import { useFetchTasks } from '../hooks/useFetchTasks';
 import { useAddMeme } from '../hooks/useAddMeme';
+import { useTasks } from '../hooks/useTasks';
 
 export default function BoardPage() {
-  const { tasks, setTasks, loading, toggleTask } = useFetchTasks();
+  const { tasks, loading, addTask, updateTask } = useTasks();
   const { addMeme } = useAddMeme();
   const [showForm, setShowForm] = useState(false);
 
-  const currentUser = { id: 'user1', role: 'admin' }; // Simulated current user
+  const currentUser = { id: 'user1', role: 'admin' };
 
   if (loading) return <p className="text-center mt-10">Loading tasks...</p>;
 
   const handleComplete = async (task) => {
-    if (task.completed) return;
+    if (task.status === 'completed') return;
 
-    await toggleTask(task.id, currentUser);
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === task.id ? { ...t, completed: true, status: 'completed', meme: task.meme } : t
-      )
-    );
+    console.log('✅ Completing task:', task.id);
+    await updateTask(task.id, currentUser);
     await addMeme(task.id, task.meme, currentUser);
   };
 
-  const handleTaskCreated = (newTask) => {
-    setTasks((prev) => [...prev, newTask]);
+  const handleTaskCreated = async (newTask) => {
+    await addTask(newTask);
     setShowForm(false);
   };
 
@@ -46,9 +42,7 @@ export default function BoardPage() {
         {showForm && (
           <div
             className="max-w-md mx-auto mb-6 animate-fadeIn"
-            style={{
-              animation: 'fadeIn 0.3s ease-in-out',
-            }}
+            style={{ animation: 'fadeIn 0.3s ease-in-out' }}
           >
             <TaskForm currentUserId="user1" onCreated={handleTaskCreated} />
           </div>
@@ -59,7 +53,9 @@ export default function BoardPage() {
             <div
               key={task.id}
               onClick={() => handleComplete(task)}
-              className="relative p-4 rounded-md shadow-lg cursor-pointer transition-transform transform hover:scale-105 bg-yellow-200"
+              className={`relative p-4 rounded-md shadow-lg cursor-pointer transition-transform transform hover:scale-105 ${
+                task.status === 'completed' ? 'bg-green-200' : 'bg-yellow-200'
+              }`}
               style={{
                 transform: `rotate(${Math.random() * 4 - 2}deg)`,
                 boxShadow: '0 4px 6px rgba(0,0,0,0.1), inset 0 0 5px rgba(255,255,255,0.5)',
@@ -69,10 +65,10 @@ export default function BoardPage() {
 
               <p className="text-lg text-gray-800 font-semibold mt-3">{task.title}</p>
               <p className="text-sm text-gray-600 mb-2">
-                {task.completed ? '✅ Completed' : '🕓 Pending'}
+                {task.status === 'completed' ? '✅ Completed' : '🕓 Pending'}
               </p>
 
-              {task.completed && task.meme && (
+              {task.status === 'completed' && task.meme && (
                 <img
                   src={task.meme}
                   alt="Meme"
