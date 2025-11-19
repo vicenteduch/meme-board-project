@@ -170,7 +170,7 @@ export default function BoardPage() {
           </button>
         </div>
 
-        {!loading && tasks.length === 0 && (
+        {!loading && userTasks.length === 0 && (
           <div className="max-w-md mx-auto mb-6 p-4 bg-white/80 rounded-lg shadow-md text-center">
             <p className="text-gray-800 font-semibold mb-1">👋 Welcome to your board!</p>
             <p className="text-gray-600 text-sm">
