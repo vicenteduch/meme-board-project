@@ -2,10 +2,19 @@ import { useEffect, useState } from 'react';
 import TaskForm from '../components/TaskForm';
 import { useAddMeme } from '../hooks/useAddMeme';
 import { useTasks } from '../hooks/useTasks';
+import { useAuth } from '../hooks/useAuth';
 
 export default function BoardPage() {
+  const { user } = useAuth();
   const { tasks, loading, addTask, updateTask, removeTask, resetTasks, updateTaskLocal } =
     useTasks();
+  const currentUserId = user?._id || user?.id || user?.name;
+  const userTasks = tasks.filter(
+    (t) =>
+      t.assignedTo === currentUserId ||
+      t.assignedTo === user?.name || // por si tienes tareas antiguas con name
+      t.assignedTo === user?.id // por compatibilidad
+  );
   const { addMeme } = useAddMeme();
 
   const [showForm, setShowForm] = useState(false);
@@ -161,19 +170,30 @@ export default function BoardPage() {
           </button>
         </div>
 
+        {!loading && tasks.length === 0 && (
+          <div className="max-w-md mx-auto mb-6 p-4 bg-white/80 rounded-lg shadow-md text-center">
+            <p className="text-gray-800 font-semibold mb-1">👋 Welcome to your board!</p>
+            <p className="text-gray-600 text-sm">
+              You have no tasks yet. Click{' '}
+              <span className="font-bold text-yellow-600">“New task”</span> to create your first
+              one.
+            </p>
+          </div>
+        )}
+
         {/* ✏️ Formulario */}
         {showForm && (
           <div
             className="max-w-md mx-auto mb-8 animate-fadeIn"
             style={{ animation: 'fadeIn 0.3s ease-in-out' }}
           >
-            <TaskForm currentUserId="user1" onCreated={handleTaskCreated} />
+            <TaskForm currentUserId={currentUserId} onCreated={handleTaskCreated} />
           </div>
         )}
 
         {/* 📋 Tareas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {tasks.map((task) => {
+          {userTasks.map((task) => {
             const isExpanded = expanded.has(task.id);
             return (
               <div

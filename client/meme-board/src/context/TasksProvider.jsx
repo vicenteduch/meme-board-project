@@ -11,27 +11,11 @@ export const TasksProvider = ({ children }) => {
     setLoading(true);
     setError(null);
 
-    const savedTasks = localStorage.getItem('tasks');
-    if (savedTasks) {
-      try {
-        const parsed = JSON.parse(savedTasks);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          console.log('📦 Loaded tasks from localStorage:', parsed);
-          setTasks(parsed);
-          setLoading(false);
-          return;
-        }
-      } catch (err) {
-        console.warn('⚠️ Could not parse localStorage tasks:', err);
-      }
-    }
-
     try {
       const res = await getTasks();
       const data = res.data || res;
       if (Array.isArray(data)) {
         setTasks(data);
-        localStorage.setItem('tasks', JSON.stringify(data));
       }
     } catch (err) {
       console.error('❌ Error loading tasks from API:', err);
@@ -41,20 +25,11 @@ export const TasksProvider = ({ children }) => {
     }
   }, []);
 
-  let lastTaskId = null;
-
   const addTask = async (task) => {
     try {
-      if (task.title === '' || task === lastTaskId) return;
-      lastTaskId = task.title;
-
       const res = await createTask(task);
       const newTask = res.data || res;
-      setTasks((prev) => {
-        const updated = [...prev, newTask];
-        localStorage.setItem('tasks', JSON.stringify(updated));
-        return updated;
-      });
+      setTasks((prev) => [...prev, newTask]);
       return newTask;
     } catch (err) {
       console.error('❌ Error creating task:', err);
@@ -62,45 +37,26 @@ export const TasksProvider = ({ children }) => {
     }
   };
 
-  // dentro del TasksProvider
-  const updateTaskLocal = (id, newData) => {
-    setTasks((prev) => {
-      const updated = prev.map((t) => (t.id === id ? { ...t, ...newData } : t));
-      localStorage.setItem('tasks', JSON.stringify(updated));
-      return updated;
-    });
-  };
-
   const updateTask = async (id, currentUser) => {
     try {
-      await completeTask(id, currentUser);
-      setTasks((prev) => {
-        const updated = prev.map((t) =>
-          t.id === id
-            ? {
-                ...t,
-                status: t.status === 'pending' ? 'completed' : 'pending',
-                completed: !t.completed, // 🔄 asegúrate de actualizar también esta
-              }
-            : t
-        );
-        localStorage.setItem('tasks', JSON.stringify(updated));
-        return updated;
-      });
+      const res = await completeTask(id, currentUser);
+      const updatedTask = res.data || res;
+
+      setTasks((prev) => prev.map((t) => (t.id === id || t._id === id ? updatedTask : t)));
     } catch (err) {
       console.error('❌ Error updating task:', err);
       setError('Could not update task');
     }
   };
 
+  const updateTaskLocal = (id, newData) => {
+    setTasks((prev) => prev.map((t) => (t.id === id || t._id === id ? { ...t, ...newData } : t)));
+  };
+
   const removeTask = async (id) => {
     try {
       await deleteTask(id);
-      setTasks((prev) => {
-        const updated = prev.filter((t) => t.id !== id);
-        localStorage.setItem('tasks', JSON.stringify(updated));
-        return updated;
-      });
+      setTasks((prev) => prev.filter((t) => t.id !== id && t._id !== id));
     } catch (err) {
       console.error('❌ Error deleting task:', err);
       setError('Could not delete task');
@@ -108,15 +64,14 @@ export const TasksProvider = ({ children }) => {
   };
 
   const resetTasks = () => {
-    setTasks((prev) => {
-      const reset = prev.map((t) => ({
+    setTasks((prev) =>
+      prev.map((t) => ({
         ...t,
         status: 'pending',
         meme: null,
-      }));
-      localStorage.setItem('tasks', JSON.stringify(reset));
-      return reset;
-    });
+        expanded: false,
+      }))
+    );
   };
 
   useEffect(() => {

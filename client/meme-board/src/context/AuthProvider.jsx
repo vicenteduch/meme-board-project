@@ -1,56 +1,86 @@
 import { useCallback, useState, useEffect } from 'react';
-import { loginUser, registerUser, getCurrentUser } from '../services/api';
+import { loginUser, registerUser, getCurrentUser, setAuthToken } from '../services/api';
 import { AuthContext } from './AuthContext';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const logout = useCallback(() => {
+    setUser(null);
+    setToken(null);
+    setAuthToken(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  }, []);
 
   const loadCurrentUser = useCallback(async () => {
     try {
-      const res = await getCurrentUser();
-      setUser(res.data);
-      localStorage.setItem('user', JSON.stringify(res.data));
-    } catch {
+      const storedUser = localStorage.getItem('user');
+      const storedToken = localStorage.getItem('token');
+
+      if (storedToken) {
+        setAuthToken(storedToken);
+        setToken(storedToken);
+      }
+
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+        setLoading(false);
+        return;
+      }
+
+      if (storedToken) {
+        const res = await getCurrentUser();
+        setUser(res.data);
+        localStorage.setItem('user', JSON.stringify(res.data));
+      }
+    } catch (err) {
+      console.error('❌ Error loading current user:', err);
       logout();
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [logout]);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      setLoading(false);
-    } else {
-      loadCurrentUser();
-    }
+    loadCurrentUser();
   }, [loadCurrentUser]);
 
   const login = async (credentials) => {
     const res = await loginUser(credentials);
-    const userData = res.data.user || res.data;
+    const { user: userData, token: newToken } = res.data;
+
     setUser(userData);
+    setToken(newToken);
+    setAuthToken(newToken);
+
     localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', newToken);
+
+    return userData;
   };
 
   const register = async (data) => {
     const res = await registerUser(data);
-    const newUser = res.data.user || res.data;
-    setUser(newUser);
-    localStorage.setItem('user', JSON.stringify(newUser));
-  };
+    const { user: newUser, token: newToken } = res.data;
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+    setUser(newUser);
+    setToken(newToken);
+    setAuthToken(newToken);
+
+    localStorage.setItem('user', JSON.stringify(newUser));
+    localStorage.setItem('token', newToken);
+
+    return newUser;
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        token,
         loading,
         login,
         register,

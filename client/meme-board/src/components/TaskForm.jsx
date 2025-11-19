@@ -12,26 +12,23 @@ export default function TaskForm({ onCreated, currentUserId = 'user1' }) {
     setError(null);
     if (!title.trim()) return setError('El título es obligatorio');
 
-    const newTask = {
+    const payload = {
       title: title.trim(),
       description: description.trim(),
       assignedTo: currentUserId,
       effortPoints: Number(effort) || 1,
       status: 'pending',
-      completed: false,
       meme: null,
     };
 
+    setLoading(true);
     try {
-      setLoading(true);
-      if (onCreated) {
-        await onCreated(newTask); // ✅ delega al contexto
-      }
+      if (onCreated) await onCreated(payload);
       setTitle('');
       setDescription('');
       setEffort(1);
     } catch (err) {
-      console.error('❌ Error al crear tarea:', err);
+      console.error('Error al crear tarea:', err);
       setError('No se pudo crear la tarea');
     } finally {
       setLoading(false);

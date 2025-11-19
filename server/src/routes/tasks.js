@@ -1,24 +1,83 @@
-// server/routes/tasks.js
-import express from "express";
-import fs from "fs";
-import path from "path";
+import { Router } from "express";
+import Task from "../models/Task.js";
 
-const router = express.Router();
-const tasksFile = path.resolve("./data/mockTasks.json");
+const router = Router();
 
-// Obtener todas las tareas
-router.get("/", (req, res) => {
-  const tasks = JSON.parse(fs.readFileSync(tasksFile));
-  res.json(tasks);
+// GET /api/tasks -> lista todas las tareas
+router.get("/", async (req, res) => {
+  try {
+    const tasks = await Task.find().sort({ createdAt: 1 });
+    res.json(tasks);
+  } catch (err) {
+    console.error("Error getting tasks:", err);
+    res.status(500).json({ message: "Error getting tasks" });
+  }
 });
 
-// Crear nueva tarea
-router.post("/", (req, res) => {
-  const tasks = JSON.parse(fs.readFileSync(tasksFile));
-  const newTask = { id: Date.now(), ...req.body };
-  tasks.push(newTask);
-  fs.writeFileSync(tasksFile, JSON.stringify(tasks, null, 2));
-  res.json(newTask);
+// POST /api/tasks -> crea tarea
+router.post("/", async (req, res) => {
+  try {
+    const task = new Task(req.body);
+    const saved = await task.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    console.error("Error creating task:", err);
+    res
+      .status(400)
+      .json({ message: "Error creating task", error: err.message });
+  }
+});
+
+// PATCH /api/tasks/:id/complete -> toggle completed
+router.patch("/:id/complete", async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    task.status = task.status === "completed" ? "pending" : "completed";
+    await task.save();
+
+    res.json(task);
+  } catch (err) {
+    console.error("Error completing task:", err);
+    res
+      .status(400)
+      .json({ message: "Error completing task", error: err.message });
+  }
+});
+
+// PATCH /api/tasks/:id/meme -> guardar URL meme
+router.patch("/:id/meme", async (req, res) => {
+  try {
+    const { meme } = req.body;
+    const task = await Task.findByIdAndUpdate(
+      req.params.id,
+      { meme },
+      { new: true }
+    );
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    res.json(task);
+  } catch (err) {
+    console.error("Error updating meme:", err);
+    res
+      .status(400)
+      .json({ message: "Error updating meme", error: err.message });
+  }
+});
+
+// DELETE /api/tasks/:id -> borrar tarea
+router.delete("/:id", async (req, res) => {
+  try {
+    const deleted = await Task.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: "Task not found" });
+    res.json({ message: "Task deleted" });
+  } catch (err) {
+    console.error("Error deleting task:", err);
+    res
+      .status(400)
+      .json({ message: "Error deleting task", error: err.message });
+  }
 });
 
 export default router;
